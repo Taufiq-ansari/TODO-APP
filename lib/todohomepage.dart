@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class ToDoHomepage extends StatefulWidget {
@@ -105,6 +104,13 @@ class _ToDoHomepageState extends State<ToDoHomepage> {
                   child: ListTile(
                     title: Text(todoList[index]["title"] ?? " "),
                     subtitle: Text(todoList[index]["desc"] ?? " "),
+                    trailing: IconButton(
+                      onPressed: () {
+                        todoList.removeAt(index);
+                        setState(() {});
+                      },
+                      icon: Icon(Icons.delete),
+                    ),
                   ),
                 );
               },
