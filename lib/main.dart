@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:todoapp/todohomepage.dart';
+import 'package:todoapp/pages/todoaddpage.dart';
+import 'package:todoapp/pages/todohomepage.dart';
+import 'package:todoapp/splash/welcomescreen.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,7 +18,9 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData(),
 
       themeMode: ThemeMode.light,
-      home: ToDoHomepage(),
+      home: ToDoHomepage(
+       
+      ),
     );
   }
 }

@@ -31,6 +31,9 @@ formatter:
   # 'preserve' keeps trailing commas if they are present.
   # The default behavior automatically removes them on single lines.
   trailing_commas: preserve
+analyzer:
+  errors:
+    must_be_immutable: ignore
 
   # rules:
     # avoid_print: false  # Uncomment to disable the `avoid_print` rule
