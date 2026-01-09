@@ -5,7 +5,7 @@ import 'package:todoapp/model/todomedel.dart';
 import 'package:todoapp/pages/todoaddpage.dart';
 
 class ToDoHomepage extends StatefulWidget {
-  ToDoHomepage({super.key});
+  const ToDoHomepage({super.key});
 
   @override
   State<ToDoHomepage> createState() => _ToDoHomepageState();
@@ -13,6 +13,11 @@ class ToDoHomepage extends StatefulWidget {
 
 class _ToDoHomepageState extends State<ToDoHomepage> {
   final List<TodoModel> todoList = [];
+
+  void deleteItem(int index) {
+    todoList.removeAt(index);
+  }
+
   @override
   Widget build(BuildContext context) {
     print("${todoList.length}");
@@ -42,9 +47,47 @@ class _ToDoHomepageState extends State<ToDoHomepage> {
                     subtitle: Text(newList.description.toString()),
                     trailing: IconButton(
                       onPressed: () {
-                        todoList.removeAt(index);
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              buttonPadding: EdgeInsets.all(12),
+                              alignment: Alignment.center,
+
+                              content: Text("Sure you want to delete?"),
+                              title: Text("delete"),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    todoList.removeAt(index);
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("task deleted")));
+                                    setState(() {});
+                                  },
+                                  child: Text("yes"),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(
+                                      context,
+                                    ).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          "item is not deleted",
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Text("no"),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                        // todoList.removeAt(index);
                         setState(() {
-                          print("task deleted $index");
+                          // print("task deleted $index");
                         });
                       },
                       icon: Icon(Icons.delete),
