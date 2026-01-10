@@ -120,7 +120,7 @@ class _ToDoHomepageState extends State<ToDoHomepage> {
         onPressed: () async {
           final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => ToDoAddpage()));
           if (result != null && result is TodoModel) {
-            helper!.addTodo(tTitle: "task1 added", dDescription: "description");
+            helper!.addTodo(tTitle: "task1 added", dDescription: "added description");
           }
           setState(() {});
         },
