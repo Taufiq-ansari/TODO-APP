@@ -1,7 +1,7 @@
-// ignore_for_file: must_be_immutable
-
 import 'package:flutter/material.dart';
-import 'package:todoapp/model/todomedel.dart';
+import 'package:todoapp/database/sqlite/dbhelper.dart';
+import 'package:todoapp/model/todomodel.dart';
+
 import 'package:todoapp/pages/todoaddpage.dart';
 
 class ToDoHomepage extends StatefulWidget {
@@ -12,21 +12,35 @@ class ToDoHomepage extends StatefulWidget {
 }
 
 class _ToDoHomepageState extends State<ToDoHomepage> {
-  final List<TodoModel> todoList = [];
+  List<Map<String, dynamic>> todoList = [];
+  DBHelper? helper = DBHelper();
 
-  void deleteItem(int index) {
-    todoList.removeAt(index);
+  @override
+  void initState() {
+    super.initState();
+    print("initstate called..");
+    helper!.myDB;
+    fetchTodo();
+  }
+
+  void fetchTodo() async {
+    print("featch todo printed..");
+    todoList = await helper!.getAllTodo();
+
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    print("${todoList.length}");
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Text(
           "TODOAPP",
-          style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.grey,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       body: todoList.isEmpty
@@ -39,12 +53,12 @@ class _ToDoHomepageState extends State<ToDoHomepage> {
           : ListView.builder(
               itemCount: todoList.length,
               itemBuilder: (context, index) {
-                final newList = todoList[index];
+                // final newList = todoList[index];
 
                 return Card(
                   child: ListTile(
-                    title: Text(newList.title.toString()),
-                    subtitle: Text(newList.description.toString()),
+                    title: Text(todoList[index][DBHelper.COLUMN_NAME_TITLE]),
+                    subtitle: Text(todoList[index][DBHelper.COLUMN_NAME_DESC]),
                     trailing: IconButton(
                       onPressed: () {
                         showDialog(
@@ -61,7 +75,11 @@ class _ToDoHomepageState extends State<ToDoHomepage> {
                                   onPressed: () {
                                     todoList.removeAt(index);
                                     Navigator.pop(context);
-                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("task deleted")));
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text("task deleted"),
+                                      ),
+                                    );
                                     setState(() {});
                                   },
                                   child: Text("yes"),
@@ -102,7 +120,7 @@ class _ToDoHomepageState extends State<ToDoHomepage> {
         onPressed: () async {
           final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => ToDoAddpage()));
           if (result != null && result is TodoModel) {
-            todoList.add(result);
+            helper!.addTodo(tTitle: "task1 added", dDescription: "description");
           }
           setState(() {});
         },

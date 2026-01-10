@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:todoapp/pages/todoaddpage.dart';
 import 'package:todoapp/pages/todohomepage.dart';
-import 'package:todoapp/splash/welcomescreen.dart';
+import 'package:todoapp/theme.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,9 +13,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(),
-      darkTheme: ThemeData(),
-
+      theme: Themes.lightTheme,
+      darkTheme: Themes.darkTheme,
       themeMode: ThemeMode.dark,
       home: ToDoHomepage(),
     );
