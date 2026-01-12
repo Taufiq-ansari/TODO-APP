@@ -77,11 +77,13 @@ class DBHelper {
   // update
 
   
-  update()async{
-    var db = await getDB();
-    db.update(TABLE_Name, )
+  // update()async{
+  //   var db = await getDB();
+  //   db.update(TABLE_Name, )
     
-  }
+  // }
+
+  
  // delete task
  Future<int> delete(int index) async{
  var db = await getDB();
