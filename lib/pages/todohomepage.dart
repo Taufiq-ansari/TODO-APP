@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:todoapp/database/sqlite/dbhelper.dart';
-import 'package:todoapp/model/todomodel.dart';
-
 import 'package:todoapp/pages/todoaddpage.dart';
 
 class ToDoHomepage extends StatefulWidget {
@@ -13,25 +11,25 @@ class ToDoHomepage extends StatefulWidget {
 
 class _ToDoHomepageState extends State<ToDoHomepage> {
   List<Map<String, dynamic>> todoList = [];
-  DBHelper? helper = DBHelper();
+ DBHelper? helper;
 
   @override
   void initState() {
     super.initState();
     print("initstate called..");
-    helper!.myDB;
-    fetchTodo();
+helper = DBHelper.getInstance;
+ fetchTodo();
   }
 
-  void fetchTodo() async {
-    print("featch todo printed..");
-    todoList = await helper!.getAllTodo();
-
+ Future<void> fetchTodo() async {
+        print("featch todo printed..");
+        todoList = await helper!.getAllTodo();
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+     // print(" build function called ${todoList.length}");
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -42,6 +40,7 @@ class _ToDoHomepageState extends State<ToDoHomepage> {
             fontWeight: FontWeight.bold,
           ),
         ),
+
       ),
       body: todoList.isEmpty
           ? Center(
@@ -72,15 +71,18 @@ class _ToDoHomepageState extends State<ToDoHomepage> {
                               title: Text("delete"),
                               actions: [
                                 TextButton(
-                                  onPressed: () {
-                                    todoList.removeAt(index);
+                                  onPressed: ()async {
+                            var rowEffected=   await helper!.delete(todoList[index][DBHelper.COLUMN_ID]);
                                     Navigator.pop(context);
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text("task deleted"),
                                       ),
                                     );
-                                    setState(() {});
+                                    setState(() {
+                                      fetchTodo();
+ print("$rowEffected");
+                                    });
                                   },
                                   child: Text("yes"),
                                 ),
@@ -103,9 +105,9 @@ class _ToDoHomepageState extends State<ToDoHomepage> {
                             );
                           },
                         );
-                        // todoList.removeAt(index);
+
                         setState(() {
-                          // print("task deleted $index");
+
                         });
                       },
                       icon: Icon(Icons.delete),
@@ -119,9 +121,16 @@ class _ToDoHomepageState extends State<ToDoHomepage> {
         shape: CircleBorder(),
         onPressed: () async {
           final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => ToDoAddpage()));
-          if (result != null && result is TodoModel) {
-            helper!.addTodo(tTitle: "task1 added", dDescription: "added description");
-          }
+            // print("$result");
+           if(result!=null){
+             fetchTodo();
+           }
+
+
+
+
+
+ print("${result}");
           setState(() {});
         },
         child: Icon(

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:todoapp/model/todomodel.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:todoapp/database/sqlite/dbhelper.dart';
+
+import '../model/todomodel.dart';
 
 class ToDoAddpage extends StatefulWidget {
   const ToDoAddpage({super.key});
@@ -13,6 +16,15 @@ class _ToDoAddpageState extends State<ToDoAddpage> {
   TextEditingController desController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+
+  DBHelper? helper;
+
+  @override
+  void initState() {
+    super.initState();
+
+    helper = DBHelper.getInstance;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,14 +107,36 @@ class _ToDoAddpageState extends State<ToDoAddpage> {
                 style: ButtonStyle(
                   backgroundColor: WidgetStatePropertyAll(const Color.fromARGB(255, 214, 200, 200)),
                 ),
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     // onclick to add  note
+
                     final todo = TodoModel(title: titleController.text, description: desController.text);
+                    var uTitle = titleController.text;
+                    var uDesc = desController.text;
+
+                    if (uTitle.isNotEmpty && uDesc.isNotEmpty) {
+                      try {
+
+                        // using model
+                        var todoInserted = await helper!.addTodo(todo);
+                        print(todo);
+
+                        Navigator.pop(context, todoInserted);
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Inserted successfully")));
+                      } catch (e) {
+                        print(e);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("ERROR : ${e}"),
+                          ),
+                        );
+                      }
+                    }
+
                     titleController.clear();
                     desController.clear();
 
-                    Navigator.pop(context, todo);
                     setState(() {});
                   }
                 },

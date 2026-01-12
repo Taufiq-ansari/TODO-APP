@@ -1,21 +1,23 @@
 // ignore_for_file: non_constant_identifier_names
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:todoapp/model/todomodel.dart';
 
 class DBHelper {
   // creating private constructor
   // DBHelper._();
 
   //making singleton for  creating  only one instance
-  // DBHelper._();
+  DBHelper._();
 
   /// variable   for table
 
   static final String TABLE_Name = "todo";
   static final String COLUMN_NAME_TITLE = "title";
   static final String COLUMN_NAME_DESC = "description";
+  static final String COLUMN_ID ="id";
 
-  // static final DBHelper getInstance = DBHelper._();
+  static final DBHelper getInstance = DBHelper._();
 
   Database? myDB;
 
@@ -29,18 +31,19 @@ class DBHelper {
   }
 
   Future<Database> openDB() async {
-    String dirPath = await getDatabasesPath();
+    String databasePath = await getDatabasesPath();
 
-    String dbPath = join(dirPath, "TODO.db");
+    String dbPath = join(databasePath, "todo.db");
     print("fullpath here : $dbPath");
 
     return await openDatabase(
       dbPath,
-      onCreate: (db, version) {
+      onCreate: (Database db, int version) {
         print("creating table: $db");
         //  create your all table
         db.execute('''
           CREATE TABLE $TABLE_Name (
+          id integer primary key autoincrement,
             title TEXT NOT NULL,
             description TEXT
           )
@@ -54,21 +57,38 @@ class DBHelper {
   // all queries
   // insert data
 
-  Future<bool> addTodo({required String tTitle, required String dDescription}) async {
-    var db = await getDB();
+  Future<int> addTodo(TodoModel todo) async {
 
-    int rows = await db.insert(TABLE_Name, {
-      COLUMN_NAME_TITLE: tTitle,
-      COLUMN_NAME_DESC: dDescription,
-    });
-    return rows > 0;
+    final db = await getDB();
+
+    int rowsEffected = await db.insert(TABLE_Name, todo.toMap(),
+    );
+    return rowsEffected;
   }
-
+ // fetch data
   Future<List<Map<String, dynamic>>> getAllTodo() async {
     var db = await getDB();
 
     List<Map<String, dynamic>> mdata = await db.query(TABLE_Name);
 
     return mdata;
+  }
+  
+  // update
+
+  
+  update()async{
+    var db = await getDB();
+    db.update(TABLE_Name, )
+    
+  }
+ // delete task
+ Future<int> delete(int index) async{
+ var db = await getDB();
+ int deletedData = await db.delete(TABLE_Name,where: "id=?",whereArgs: [index]);
+ return deletedData;
+
+
+
   }
 }
