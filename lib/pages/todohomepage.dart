@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todoapp/database/sqlite/dbhelper.dart';
+import 'package:todoapp/model/todomodel.dart';
 import 'package:todoapp/pages/todoaddpage.dart';
 
 class ToDoHomepage extends StatefulWidget {
@@ -10,8 +11,8 @@ class ToDoHomepage extends StatefulWidget {
 }
 
 class _ToDoHomepageState extends State<ToDoHomepage> {
-  List<Map<String, dynamic>> todoList = [];
- DBHelper? helper;
+  List<TodoModel> todoList = [];
+  late DBHelper helper;
 
   @override
   void initState() {
@@ -23,7 +24,7 @@ helper = DBHelper.getInstance;
 
  Future<void> fetchTodo() async {
         print("featch todo printed..");
-        todoList = await helper!.getAllTodo();
+        todoList = await helper.getAllTodo();
     setState(() {});
   }
 
@@ -52,66 +53,89 @@ helper = DBHelper.getInstance;
           : ListView.builder(
               itemCount: todoList.length,
               itemBuilder: (context, index) {
-                // final newList = todoList[index];
+                final newList = todoList[index];
 
                 return Card(
                   child: ListTile(
-                    title: Text(todoList[index][DBHelper.COLUMN_NAME_TITLE]),
-                    subtitle: Text(todoList[index][DBHelper.COLUMN_NAME_DESC]),
-                    trailing: IconButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              buttonPadding: EdgeInsets.all(12),
-                              alignment: Alignment.center,
+                    title: Text(newList.title.toString()),
+                    subtitle: Text(newList.description.toString()),
+                    trailing: Row( mainAxisSize: MainAxisSize.min,
+                      children: [
+                        //edit button
+                        IconButton(onPressed: () async{
+                          print("update button working...");
 
-                              content: Text("Sure you want to delete?"),
-                              title: Text("delete"),
-                              actions: [
-                                TextButton(
-                                  onPressed: ()async {
-                            var rowEffected=   await helper!.delete(todoList[index][DBHelper.COLUMN_ID]);
-                                    Navigator.pop(context);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text("task deleted"),
-                                      ),
-                                    );
-                                    setState(() {
-                                      fetchTodo();
- print("$rowEffected");
-                                    });
-                                  },
-                                  child: Text("yes"),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    ScaffoldMessenger.of(
-                                      context,
-                                    ).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          "item is not deleted",
+                          final prenote = TodoModel( id: newList.id, title:newList.title, description:newList.description);
+
+
+                         final result = await Navigator.push(context, MaterialPageRoute(builder: (context)=>ToDoAddpage(todo: prenote,)));
+                          if(result != null){
+                           await fetchTodo();
+                          }
+                          setState(() {});
+                        },
+
+                           icon: Icon(Icons.edit)),
+
+                        // delete button
+                        IconButton(
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      buttonPadding: EdgeInsets.all(12),
+                                      alignment: Alignment.center,
+
+                                      content: Text("Sure you want to delete?"),
+                                      title: Text("delete"),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: ()async {
+                                            var rowEffected=   await helper.delete(todoList[index].id!);
+                                            Navigator.pop(context);
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Text("task deleted"),
+                                              ),
+                                            );
+                                           await fetchTodo();
+                                            setState(() {
+
+                                              print("$rowEffected");
+                                            });
+                                          },
+                                          child: Text("yes"),
                                         ),
-                                      ),
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  "item is not deleted",
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: Text("no"),
+                                        ),
+                                      ],
                                     );
                                   },
-                                  child: Text("no"),
-                                ),
-                              ],
-                            );
-                          },
-                        );
+                                );
 
-                        setState(() {
+                                setState(() {
 
-                        });
-                      },
-                      icon: Icon(Icons.delete),
+                                });
+                              },
+                              icon: Icon(Icons.delete),
+                            ),
+                      ],
                     ),
+
                   ),
                 );
               },
@@ -120,17 +144,18 @@ helper = DBHelper.getInstance;
         backgroundColor: Colors.grey,
         shape: CircleBorder(),
         onPressed: () async {
-          final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => ToDoAddpage()));
-            // print("$result");
-           if(result!=null){
-             fetchTodo();
+          final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => ToDoAddpage(
+
+          ),
+          ),
+          );
+            print(" result :$result");
+           if(result != null ){
+           await  fetchTodo();
            }
-
-
-
-
-
- print("${result}");
+           else{
+             print("ERROR : $result");
+           }
           setState(() {});
         },
         child: Icon(

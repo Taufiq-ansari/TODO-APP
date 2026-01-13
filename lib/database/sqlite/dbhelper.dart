@@ -15,7 +15,7 @@ class DBHelper {
   static final String TABLE_Name = "todo";
   static final String COLUMN_NAME_TITLE = "title";
   static final String COLUMN_NAME_DESC = "description";
-  static final String COLUMN_ID ="id";
+  static final String COLUMN_ID = "id";
 
   static final DBHelper getInstance = DBHelper._();
 
@@ -30,6 +30,8 @@ class DBHelper {
     }
   }
 
+
+  //open database
   Future<Database> openDB() async {
     String databasePath = await getDatabasesPath();
 
@@ -58,39 +60,45 @@ class DBHelper {
   // insert data
 
   Future<int> addTodo(TodoModel todo) async {
-
     final db = await getDB();
 
-    int rowsEffected = await db.insert(TABLE_Name, todo.toMap(),
+    int rowsEffected = await db.insert(
+      TABLE_Name,
+      todo.toMap(),
     );
     return rowsEffected;
   }
- // fetch data
-  Future<List<Map<String, dynamic>>> getAllTodo() async {
+
+  // getall task
+  Future<List<TodoModel>> getAllTodo() async {
     var db = await getDB();
 
     List<Map<String, dynamic>> mdata = await db.query(TABLE_Name);
 
-    return mdata;
+    return List.generate(mdata.length, (task) {
+      return TodoModel(
+        id: mdata[task]["id"],
+        title: mdata[task]["title"],
+        description: mdata[task]['description'],
+      );
+    }
+    );
   }
-  
-  // update
 
-  
-  // update()async{
-  //   var db = await getDB();
-  //   db.update(TABLE_Name, )
-    
-  // }
+    // update task
+       Future<int> update(int id, TodoModel todoUpdate)async{
+       var db = await getDB();
 
-  
- // delete task
- Future<int> delete(int index) async{
- var db = await getDB();
- int deletedData = await db.delete(TABLE_Name,where: "id=?",whereArgs: [index]);
- return deletedData;
+      int  updateData = await db.update(TABLE_Name, todoUpdate.toMap(),where: 'id=?',whereArgs:[id]);
+    return updateData;
+     }
 
 
+    // delete task
+    Future<int> delete(int index) async {
+      var db = await getDB();
+      int deletedData = await db.delete(TABLE_Name, where: "id=?", whereArgs: [index]);
+      return deletedData;
+    }
 
-  }
 }

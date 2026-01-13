@@ -5,7 +5,12 @@ import 'package:todoapp/database/sqlite/dbhelper.dart';
 import '../model/todomodel.dart';
 
 class ToDoAddpage extends StatefulWidget {
-  const ToDoAddpage({super.key});
+  const ToDoAddpage({super.key, this.todo, this.id});
+
+  final TodoModel? todo;
+
+   // explicite  id for update
+ final int? id;
 
   @override
   State<ToDoAddpage> createState() => _ToDoAddpageState();
@@ -17,13 +22,20 @@ class _ToDoAddpageState extends State<ToDoAddpage> {
 
   final _formKey = GlobalKey<FormState>();
 
-  DBHelper? helper;
+late  DBHelper helper;
 
   @override
   void initState() {
     super.initState();
-
     helper = DBHelper.getInstance;
+ // prefilled title & description
+    if(
+    widget.todo != null
+    ){
+      titleController.text= "${widget.todo!.title}";
+      desController.text =  "${widget.todo!.description}";
+    }
+
   }
 
   @override
@@ -35,10 +47,6 @@ class _ToDoAddpageState extends State<ToDoAddpage> {
           "TODOAPP",
           style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
         ),
-
-        // add actions buttton to delete task
-        //
-        // ,
       ),
       body: Form(
         key: _formKey,
@@ -53,12 +61,10 @@ class _ToDoAddpageState extends State<ToDoAddpage> {
                 decoration: InputDecoration(
                   labelText: 'Title',
                   labelStyle: TextStyle(color: Color.fromARGB(255, 214, 200, 200)),
-
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey, width: 1.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
-
                   focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: const Color.fromARGB(255, 180, 187, 193), width: 2.5),
                     borderRadius: BorderRadius.circular(12),
@@ -72,22 +78,18 @@ class _ToDoAddpageState extends State<ToDoAddpage> {
                 },
               ),
             ),
-
             // description input field
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: TextFormField(
                 controller: desController,
-
                 decoration: InputDecoration(
                   labelText: 'Description',
                   labelStyle: TextStyle(color: Color.fromARGB(255, 214, 200, 200)),
-
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey, width: 1.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
-
                   focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: const Color.fromARGB(255, 180, 187, 193), width: 2.5),
                     borderRadius: BorderRadius.circular(12),
@@ -110,20 +112,32 @@ class _ToDoAddpageState extends State<ToDoAddpage> {
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     // onclick to add  note
-
                     final todo = TodoModel(title: titleController.text, description: desController.text);
-                    var uTitle = titleController.text;
-                    var uDesc = desController.text;
+                     print("  desc print : ${desController.text}");
+                     // print("$titleController");
+
+                    final uTitle = titleController.text;
+                    final uDesc = desController.text;
 
                     if (uTitle.isNotEmpty && uDesc.isNotEmpty) {
                       try {
-
+                        if(widget.todo==null) {
                         // using model
-                        var todoInserted = await helper!.addTodo(todo);
-                        print(todo);
+                            var todoInserted = await helper.addTodo(todo);
+                            print(todo);
+                            print(todoInserted);
+                            Navigator.pop(context, todoInserted);
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Inserted successfully")));
+                            }
+                        else{
+                        // for update todo
+                          final updatedTodo = await helper.update(widget.id!, todo);
 
-                        Navigator.pop(context, todoInserted);
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Inserted successfully")));
+                          Navigator.pop(context, updatedTodo);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Updated successfully")),
+                          );
+                        }
                       } catch (e) {
                         print(e);
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -133,15 +147,15 @@ class _ToDoAddpageState extends State<ToDoAddpage> {
                         );
                       }
                     }
-
                     titleController.clear();
                     desController.clear();
+                    setState(() {
 
-                    setState(() {});
+                    });
                   }
                 },
                 child: Text(
-                  "ADD",
+                 widget.todo==null? "ADD": "update",
                   style: TextStyle(color: Colors.white),
                 ),
               ),
