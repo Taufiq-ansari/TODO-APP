@@ -1,15 +1,24 @@
+import 'dart:ui';
+import 'package:flutter/material.dart';
+
 class TodoModel {
   final int? id;
   String? title;
   String? description;
+  int priority;
+
+
 
   TodoModel({ this.id,
     required this.title,
     required this.description,
+     this.priority =1,
+
   });
 
-  // from json
 
+
+  // from json
   factory TodoModel.fromJson(Map<String, String> json) {
     return TodoModel(
       id : json["id"] as  int,
@@ -19,7 +28,6 @@ class TodoModel {
   }
 
   // tomap
-
   Map<String, dynamic> toMap() {
     return {
       "id": id,

@@ -86,10 +86,10 @@ class DBHelper {
   }
 
     // update task
-       Future<int> update(int id, TodoModel todoUpdate)async{
+       Future<int> update(int index, TodoModel todoUpdate)async{
        var db = await getDB();
 
-      int  updateData = await db.update(TABLE_Name, todoUpdate.toMap(),where: 'id=?',whereArgs:[id]);
+      int  updateData = await db.update(TABLE_Name, todoUpdate.toMap(),where: 'id=?',whereArgs:[index]);
     return updateData;
      }
 

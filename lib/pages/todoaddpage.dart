@@ -5,12 +5,12 @@ import 'package:todoapp/database/sqlite/dbhelper.dart';
 import '../model/todomodel.dart';
 
 class ToDoAddpage extends StatefulWidget {
-  const ToDoAddpage({super.key, this.todo, this.id});
+  const ToDoAddpage({super.key, this.todo, });
 
   final TodoModel? todo;
 
    // explicite  id for update
- final int? id;
+ // final int? id;
 
   @override
   State<ToDoAddpage> createState() => _ToDoAddpageState();
@@ -112,7 +112,7 @@ late  DBHelper helper;
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     // onclick to add  note
-                    final todo = TodoModel(title: titleController.text, description: desController.text);
+                    final todo = TodoModel( id: widget.todo?.id, title: titleController.text, description: desController.text);
                      print("  desc print : ${desController.text}");
                      // print("$titleController");
 
@@ -131,7 +131,7 @@ late  DBHelper helper;
                             }
                         else{
                         // for update todo
-                          final updatedTodo = await helper.update(widget.id!, todo);
+                          final updatedTodo = await helper.update(widget.todo!.id!, todo);
 
                           Navigator.pop(context, updatedTodo);
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -142,7 +142,7 @@ late  DBHelper helper;
                         print(e);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text("ERROR : ${e}"),
+                            content: Text("ERROR : $e"),
                           ),
                         );
                       }
