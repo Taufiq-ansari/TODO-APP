@@ -1,29 +1,28 @@
 import 'dart:ui';
-import 'package:flutter/material.dart';
 
 class TodoModel {
   final int? id;
-  String? title;
-  String? description;
-  int priority;
+ final String title;
+ final  String description;
+  late final  int?  colorValue;
 
 
 
   TodoModel({ this.id,
     required this.title,
     required this.description,
-     this.priority =1,
+    required  this.colorValue,
 
   });
-
 
 
   // from json
   factory TodoModel.fromJson(Map<String, String> json) {
     return TodoModel(
       id : json["id"] as  int,
-      title: json["title"],
-      description: json["description"],
+      title: json["title"] as String,
+      description: json["description"] as String,
+      colorValue:json['colorValue'] as  int ,
     );
   }
 
@@ -33,6 +32,15 @@ class TodoModel {
       "id": id,
       "title": title,
       "description": description,
+      "colorValue":colorValue,
     };
   }
+  /// get color
+Color get color => Color(colorValue!);
+
+  // set color
+set setColor(Color newColor){
+  colorValue =Color(newColor as int) as int;
+}
+
 }

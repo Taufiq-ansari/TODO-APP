@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:todoapp/database/sqlite/dbhelper.dart';
 import 'package:todoapp/pages/todoaddpage.dart';
+import '../database/sqlite/dbhelper.dart';
 import '../model/todomodel.dart';
 
 
@@ -19,29 +19,31 @@ class _ToDoHomepageState extends State<ToDoHomepage> {
 
 
 
-  Color colorChoice(int? priorityColor){
-   switch(priorityColor){
-     case 1:
-       return Colors.grey.shade300;  // high prio
-
-   case 2:
-     return Colors.redAccent;       // medium prio
-
-     case 3:
-       return Colors.green;         // low prio
-
-       default:
-         return Colors.amber;
-   }
- }
+ //  Color colorChoice(int? priorityColor){
+ //
+ //    // print(" ==> color $priorityColor");
+ //   switch(priorityColor){
+ //     case 1:
+ //       return Colors.grey.shade300;  // low prio
+ //
+ //   case 2:
+ //     return Colors.redAccent;       // high prio
+ //
+ //     case 3:
+ //       return Colors.green;         // medium prio
+ //
+ //       default:
+ //         return Colors.amber;
+ //   }
+ // }
  // color change by index
- void updatePriority(int index){
-    print("===> color change $index");
-     todoList[index].priority =todoList[index].priority==3?1:todoList[index].priority+1;
-    setState(() {
-
-    });
- }
+ // void updatePriority(int index){
+ //    print("===> color change $index");
+ //     // todoList[index].colorValue =todoList[index].colorValue==4?1:todoList[index].colorValue!+1;
+ //    setState(() {
+ //
+ //    });
+ // }
 
 
   @override
@@ -89,16 +91,17 @@ helper = DBHelper.getInstance;
 
                 return GestureDetector(
 
-                  onTap: ()=>updatePriority(index),
+                  // onTap: ()=>updatePriority(index),
                   child: Card(
 
-                    color: colorChoice(newList.priority),
+                    color: newList.color,
 
                     child: ListTile(
                       title: Text(newList.title.toString()),
                       subtitle: Text(newList.description.toString()),
                       trailing: Row( mainAxisSize: MainAxisSize.min,
                         children: [
+
                           //edit button
                           IconButton(onPressed: () async{
                             print("===> update...");

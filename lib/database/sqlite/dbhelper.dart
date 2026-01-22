@@ -16,6 +16,7 @@ class DBHelper {
   static final String COLUMN_NAME_TITLE = "title";
   static final String COLUMN_NAME_DESC = "description";
   static final String COLUMN_ID = "id";
+  static final String COLUMN_COLOR = "colorValue";
 
   static final DBHelper getInstance = DBHelper._();
 
@@ -47,12 +48,24 @@ class DBHelper {
           CREATE TABLE $TABLE_Name (
           id integer primary key autoincrement,
             title TEXT NOT NULL,
-            description TEXT
+            description TEXT,
+            colorValue integer not null
+         
           )
           ''');
         print("table created successfully...");
       },
-      version: 1,
+
+
+      //adding column in todo table
+      onUpgrade:(db, oldversion,newversion) async {
+      // adding new column in existing table
+        if(oldversion<2){
+         await db.execute('alter table $TABLE_Name add column colorValue integer ');
+        }
+
+      },
+      version: 2,
     );
   }
 
@@ -64,7 +77,9 @@ class DBHelper {
 
     int rowsEffected = await db.insert(
       TABLE_Name,
+
       todo.toMap(),
+
     );
     return rowsEffected;
   }
@@ -73,13 +88,14 @@ class DBHelper {
   Future<List<TodoModel>> getAllTodo() async {
     var db = await getDB();
 
-    List<Map<String, dynamic>> mdata = await db.query(TABLE_Name);
+    List<Map<String, dynamic>> mdata = await db.query(TABLE_Name,orderBy: "id DESC");
 
     return List.generate(mdata.length, (task) {
       return TodoModel(
         id: mdata[task]["id"],
         title: mdata[task]["title"],
         description: mdata[task]['description'],
+          colorValue: mdata[task]['colorValue']
       );
     }
     );
