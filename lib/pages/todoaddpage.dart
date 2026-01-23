@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:todoapp/database/sqlite/dbhelper.dart';
@@ -41,7 +42,7 @@ late  DBHelper helper;
   ];
 
   //===> color index
-  int colorIndex =-1;
+  int colorIndex =0;
 
   //===> change color
   void changeColor(Color color){
@@ -59,14 +60,22 @@ late  DBHelper helper;
     super.initState();
     helper = DBHelper.getInstance;
  // prefilled title & description
-    if(
-    widget.todo != null
-    ){
+    if(widget.todo != null){
       titleController.text= "${widget.todo!.title}";
       desController.text =  "${widget.todo!.description}";
+
+
+      final savedColor = Color(widget.todo!.colorValue??Colors.indigo.value);
+
+       currentColor =savedColor;
+
+       _selectedColor =savedColor;
+
+       colorIndex =colors.indexWhere((e)=>e.value ==savedColor.value) ;
     }
 
   }
+
 
 
 
@@ -142,7 +151,8 @@ Row(
 
         style: ElevatedButton.styleFrom(
             shape: CircleBorder(),
-            minimumSize: Size(30, 30)
+            minimumSize: Size(30, 30),
+          backgroundColor:currentColor==null? Color.fromARGB(255, 214, 200, 200):currentColor,
 
         ),
         onPressed: (){
@@ -164,9 +174,8 @@ Row(
                 ElevatedButton(onPressed: (){
 
                   // colors.add(currentColor);
-                  colorIndex=colors.length-1;
-                  colors[colorIndex]=currentColor;
-
+                  // colorIndex=colors.length-1;
+                  // colors[colorIndex]=currentColor;
                   _selectedColor = currentColor;
 
                   Navigator.pop(context);
@@ -182,16 +191,18 @@ Row(
           setState(() {
 
           });
-        }, child: Icon(Icons.brush_outlined)),
+        }, child: Icon(Icons.brush_outlined,color: Colors.white,)),
 
     Row(
       children: List.generate(
           colors.length, (int index){
         return GestureDetector(
           onTap:(){
+            
             colorIndex =index;
-            _selectedColor =colors[index];
             currentColor =colors[index];
+            _selectedColor =colors[index];
+
             setState(() {
 
             });
@@ -201,7 +212,7 @@ Row(
             child: CircleAvatar(
               radius:  13,
               backgroundColor:colors[index],
-              child:colorIndex==index? Icon(Icons.done, size: 16,color: Colors.white,
+              child: ( colorIndex==index)? Icon(Icons.done, size: 16,color: Colors.white,
               ): null,
             ),
           ),
